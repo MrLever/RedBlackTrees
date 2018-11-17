@@ -12,6 +12,8 @@ var cube;
 var shadowMapWidth = 1024;
 var shadowMapHeight = 1024;
 
+var redBlackTree = new RedBlackTree();
+
 //Functions
 function initRenderer(){
     renderer = new THREE.WebGLRenderer( { antialias: true } );//let renderer = new THREE.WebGLRenderer();
@@ -120,7 +122,7 @@ function mainFunction(){
     var shadowReciever = myShader.clone();
     shadowReciever.uniforms.isShadowReciever.value = true;
 
-    var redBlackTree = new RedBlackTree();
+    
     
     //Back plane (Recivever)
     var backPlaneMat = myShader.clone();

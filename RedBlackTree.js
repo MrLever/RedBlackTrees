@@ -9,35 +9,55 @@ class Node{
 
 class RedBlackTree{
     constructor(){
-        this.root = null;
+        this.root = new Node(undefined);
+        
+        //Private Functions
+
     }
-    
-    InsertNode(value){
-        var node = new Node(value);
-        if(root == null){
-            root = node;
-            node.IsRed = false;
+
+    //Public Functions
+    ValidateTree(){
+            
+    }
+
+    InsertNode(value, root = this.root){
+        //console.log(root);
+        if(root.Value == undefined){
+            root.Value = value;
+            root.IsRed = false;
+            
+            root.LST = new Node(undefined);
+            root.RST = new Node(undefined);
+
+            return; 
+        }
+        if(value < root.Value){
+            this.InsertNode(value, root.LST);
+        }
+        else{
+            this.InsertNode(value, root.RST);
         }
     }
 
-    DeleteNode(root, target){
+    DeleteNode(value, root = this.root){
         if(root == null){
             return;
         }
         if (root == target){
             //Clean up display
-            //Set node to null
+            root == null;
             return;
         }
 
         if(target < root.Value){
-            DeleteNode(root.LST, target);
+            DeleteNode(target, root.LST);
         }
         else{
-            DeleteNode(root.RST, target);
+            DeleteNode(target, root.RST);
         }
     }
-    FindNode(root, target){
+
+    FindNode(target, root = this.root){
         if(root == null){
             return false;
         }
@@ -48,10 +68,22 @@ class RedBlackTree{
         }
 
         if(target < root.Value){
-            return FindNode(root.LST, target);
+            return FindNode(target, root.LST);
         }
         else{
-            return FindeNode(root.RST, target);
+            return FindeNode(target, root.RST);
         }
+    }
+
+    Print(root = this.root){
+        if(root == null){
+            return;
+        }
+
+        this.PrintTree(root.LST);
+        console.log(root);
+        this.PrintTree(root.RST);
+
+        return;
     }
 }
