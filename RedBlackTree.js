@@ -58,31 +58,31 @@ class RedBlackTree{
     }
 
     FindNode(target, root = this.root){
-        if(root == null){
+        if(root == null || root.Value == undefined){
             return false;
         }
-        if (root == target){
+        if (root.Value == target){
             //Clean up display
             //Set node to null
             return true;
         }
 
         if(target < root.Value){
-            return FindNode(target, root.LST);
+            return this.FindNode(target, root.LST);
         }
         else{
-            return FindeNode(target, root.RST);
+            return this.FindNode(target, root.RST);
         }
     }
 
     Print(root = this.root){
-        if(root == null){
+        if(root.Value == undefined){
             return;
         }
 
-        this.PrintTree(root.LST);
-        console.log(root);
-        this.PrintTree(root.RST);
+        this.Print(root.LST);
+        console.log(root.Value + " ");
+        this.Print(root.RST);
 
         return;
     }
