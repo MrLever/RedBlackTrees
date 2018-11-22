@@ -106,13 +106,19 @@ function drawNode(root, x, y) {
 
     var nodeGeo = new THREE.SphereGeometry(5, 32, 32);
     var nodeMat = nodeShader.clone();
-    var nodeMesh = new THREE.Mesh(nodeGeo, nodeMat);
-    if (root.isRed) {
+    
+    if (root.IsRed) {
+        console.log("Color red");
         nodeMat.uniforms.materialColor.value = new THREE.Vector3(.5, 0, 0);
     }
     else {
+        console.log("Color black");
         nodeMat.uniforms.materialColor.value = new THREE.Vector3(.1, .1, .1);
     }
+
+    var nodeMesh = new THREE.Mesh(nodeGeo, nodeMat);
+
+
     nodeMesh.translateX(x);
     nodeMesh.translateY(y);
     scene.add(nodeMesh);

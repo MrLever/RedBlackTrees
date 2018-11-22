@@ -24,13 +24,17 @@ class RedBlackTree{
         //console.log(root);
         if(root.Value == undefined){
             root.Value = value;
-            root.IsRed = false;
+            root.IsRed = true;
             
             root.LST = new Node(undefined);
             root.RST = new Node(undefined);
 
             return; 
         }
+        if(root = this.root){
+            root.IsRed = false;
+        }
+
         if(value < root.Value){
             this.InsertNode(value, root.LST);
         }
