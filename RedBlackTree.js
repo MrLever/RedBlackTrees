@@ -21,26 +21,21 @@ class RedBlackTree{
     }
 
     InsertNode(value, root = this.root){
-        //console.log(root);
         if(root.Value == undefined){
             root.Value = value;
             root.IsRed = true;
-            
+
             root.LST = new Node(undefined);
             root.RST = new Node(undefined);
-
-            return; 
+            return;
         }
-        if(root = this.root){
-            root.IsRed = false;
-        }
-
-        if(value < root.Value){
+        else if(value < root.Value){
             this.InsertNode(value, root.LST);
         }
         else{
             this.InsertNode(value, root.RST);
         }
+        
     }
 
     DeleteNode(value, root = this.root){
