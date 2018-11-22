@@ -4,11 +4,6 @@ class Node{
         this.LST = null;
         this.RST = null;
         this.IsRed = true;
-        
-        var geometry = new THREE.CubeGeometry(5,5,5);
-        //var material = nodeShader.copy();
-        //var NodeSphere = new THREE.Mesh(geometry, material);
-
     };
 }
 
