@@ -121,6 +121,7 @@ function drawNode(root, x, y) {
 
     nodeMesh.translateX(x);
     nodeMesh.translateY(y);
+
     scene.add(nodeMesh);
 }
 
@@ -130,7 +131,19 @@ function mainFunction(){
     var cubeGeo = new THREE.CubeGeometry(5,5,5);
     var cubeMat = nodeShader.clone();
     var cube =  new THREE.Mesh(cubeGeo, cubeMat);
-    cubeMat.uniforms.materialColor.value = new THREE.Vector3(.5, 0, .5);
+    cubeMat.uniforms.materialColor.value = new THREE.Vector3(.5, 0, .5)
+
     scene.add(cube);
 
+    animationLoop();
+
+    //Insert
+    //Restructure
+    //Recolor
+
+}
+
+function animationLoop(){
+    render();
+    requestAnimationFrame(animationLoop);
 }

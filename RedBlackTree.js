@@ -3,7 +3,7 @@ class Node{
         this.Value = val;
         this.LST = null;
         this.RST = null;
-        this.IsRed = true;
+        this.IsRed = false;
     };
 }
 
@@ -23,10 +23,10 @@ class RedBlackTree{
     InsertNode(value, root = this.root){
         if(root.Value == undefined){
             root.Value = value;
-            root.IsRed = true;
 
             root.LST = new Node(undefined);
             root.RST = new Node(undefined);
+            
             return;
         }
         else if(value < root.Value){
