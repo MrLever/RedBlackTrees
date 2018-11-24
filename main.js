@@ -4,8 +4,12 @@
 var redBlackTree = new RedBlackTree();
 
 function mainFunction(){
-    redBlackTree.InsertNode(8);
-    redBlackTree.InsertNode(6);
-    redBlackTree.InsertNode(5);
+    redBlackTree.InsertNode(1);
+    redBlackTree.InsertNode(0);
+    redBlackTree.InsertNode(2);
+    redBlackTree.InsertNode(3);
+    redBlackTree.InsertNode(4);
+    
 
+    //redBlackTree.InOrderTraversal();
 }

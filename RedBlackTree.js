@@ -1,212 +1,136 @@
 class Node{
-    constructor(val){
-        this.Value = val;
-        this.Parent = null;
-        this.LST = null;
-        this.RST = null;
-        this.IsRed = false;
-    };
-}
-
-class RedBlackTree{
-    constructor(){
-        this.root = new Node(undefined);
+    constructor(value){
+        this.value = value;
         
-        //Private Functions
+        this.parent = undefined;
+        this.LST = undefined;
+        this.RST = undefined;
 
+        this.isRed = false;
     }
+    getUncle(){
+        let grandParent = this.getGrandParent();
+        if(grandParent == undefined){
+            return undefined;
+        }
 
-    //Public Functions
-    findUncle(node){
-        var grandParent = node.Parent.Parent;
-        if(grandParent.LST == node.Parent){
+        if(this.parent.getIsLeftChild()){
             return grandParent.RST;
         }
         else{
             return grandParent.LST;
         }
     }
-    swapNodes(a, b){
-        // var temp = new Node();
-        // temp.Value = a.Value;
-        // temp.LST = a.LST;
-        // temp.RST = a.RST;
-        // temp.Parent = a.Parent;
-        // temp.IsRed = a.IsRed;
-
-        // a.Value = b.Value;
-        // a.LST = b.LST;
-        // a.RST = b.RST;
-        // a.Parent = b.Parent;
-        // a.IsRed = b.IsRed;
-
-        // b.Value = temp.Value;
-        // b.LST = temp.LST;
-        // b.RST = temp.RST;
-        // b.Parent = temp.Parent;
-        // b.IsRed = temp.IsRed;
-
-        console.log("In swap: " + a.Value, b.Value);
+    getIsLeftChild(){
+        return this.parent.LST === this;
     }
-    ValidateTreeInsertion(node){
-        if(node == this.root){
-            node.IsRed = false;
-            return;
+    getGrandParent(){
+        return (this.parent != undefined) ? this.parent.parent : undefined;
+    }
+    
+}
+class RedBlackTree{
+    constructor(){
+        this.root = new Node(undefined);
+    }
+
+    InOrderTraversal(root = this.root){
+        if(root.LST != undefined){
+            this.InOrderTraversal(root.LST);
         }
-        if(node.Parent.IsRed == true){
-            var uncle = this.findUncle(node);
-            if(uncle.IsRed){ //Recolor tree
-                console.log("Recolor Tree");
-                uncle.IsRed == false;
-                node.Parent.IsRed == false;
-                node.Parent.Parent.IsRed = true;
-                
-                //Percolate adjustments upwards
-                this.ValidateTreeInsertion(node.Parent.Parent);
-                return;
-            }
-            else{ //Rotate tree
-                console.log("Rotate Tree");
-                var grandParent = node.Parent.Parent;
-                var parent = node.Parent;
-                var uncle = this.findUncle(node);
-                var t1;
-                var t2;
-                var t3;
-                var t4;
-                var t5;
-
-                if(grandParent.LST == parent){
-                    if(parent.LST == node){
-                        console.log("Left-Left rotation from: " + node.Value);
-                        t1 = node.LST;
-                        t2 = node.RST;
-                        t3 = parent.RST;
-                        t4 = uncle.LST;
-                        t5 = uncle.RST;
-                        
-                        //Make a new copy because Javascript is garbage.
-                        var temp = new Node();
-                        temp.Value = grandParent.Value;
-                        temp.LST = grandParent.LST;
-                        temp.RST = grandParent.RST;
-                        temp.Parent = grandParent.Parent;
-                        temp.IsRed = grandParent.IsRed;
-
-
-                        var newGrandparent = node.Parent.Parent;
-                        console.log("Before Swap: " + newGrandparent.Value + " " +  parent.Value)
-                        this.swapNodes(newGrandparent, parent)
-                        console.log("After Swap: " + newGrandparent.Value + " " +  parent.Value)
-
-
-                        //console.log("New GP: " + node.Parent.Parent.Value);
-                        // var newGrandparent = parent;
-                        // newGrandparent.LST = node;
-                        // newGrandparent.RST = grandParent;
-                        // newGrandparent.RST.LST = t3;
-                        // newGrandparent.RST.RST = uncle;
-                        // newGrandparent.RST.RST.LST = t4;
-                        // newGrandparent.RST.RST.RST = t5;
-
-                        // grandParent = newGrandparent;
-
-                    }
-                    else{
-                        console.log("Left-right rotation");
-                    }
-                }
-                else{
-                    if(parent.LST == node){
-                        console.log("Right-left rotation");
-                    }
-                    else{
-                        console.log("Right-Right rotation");
-                    }
-                }
-            }
-        }
-        else{
-            //console.log("Insertion Invalid");
+        console.log(root.value);
+        if(root.RST != undefined){
+            this.InOrderTraversal(root.RST);
         }
     }
-    InsertNode(value, parent = undefined, root = this.root){
-        if(root == this.root && root.Value == undefined) {
-            root.Value = value;
-            root.IsRed == false;
-            root.Parent = undefined;
-            root.LST = new Node(undefined);
-            root.RST = new Node(undefined);
+
+    Recolor(node) {
+        console.log("Recolor");
+        node.parent.isRed = false;
+        node.getUncle.isRed = false;
+        node.getGrandParent.isRed = true;
+        console.log("Propagate corrections upward");
+        this.ValidateInsertion(node.getGrandParent());
+    }
+
+    Rotate(){
+        console.log("Rotate");
+
+        //LEFT-LEFT Rotation
+        //LEFT-RIGHT Rotation
+        //RIGHT-LEFT Rotation
+        //Right-RIGHT Roation
+    }
+
+    ValidateInsertion(node){
+        console.log("Validating " + node.value + ":");
+        var uncle  = node.getUncle();
+
+        if(node.getGrandParent() == undefined){
+            console.log("No grandparent, no op");
             return;
         }
 
-
-        if(root.Value == undefined){
-            root.Value = value;
-            root.IsRed = true;
-            root.Parent = parent;
-            root.LST = new Node(undefined);
-            root.RST = new Node(undefined);
-
-
-            this.ValidateTreeInsertion(root);
+        if(node === this.root){
+            node.isRed = false;
+            console.log("Root recolored");
             return;
         }
-
-        else if(value < root.Value){
-            this.InsertNode(value, root, root.LST);
+        
+        if(uncle == undefined || uncle.isRed == false){
+            this.Rotate(node);
+            this.Recolor(node);
         }
         else{
-            this.InsertNode(value, root, root.RST);
+            this.Recolor(node);
         }
+        
         
     }
 
-    DeleteNode(value, root = this.root){
-        if(root == null){
-            return;
-        }
-        if (root == target){
-            //Clean up display
-            root == null;
+
+
+    InsertNode(value, root = this.root){
+        if(root.value == undefined){ //Only at root
+            console.log("Insert at root");
+            root.value = value;
+            root.isRed = false;
+
             return;
         }
 
-        if(target < root.Value){
-            DeleteNode(target, root.LST);
+        if(value < root.value){
+            if(root.LST === undefined){ //Insert
+                console.log("Insert LST");
+                root.LST = new Node(value);
+                root.LST.isRed = true;
+                root.LST.parent = root;
+
+                this.ValidateInsertion(root.LST);
+
+                return;
+            }
+            else{ //Move down tree
+                console.log("Move down LST");
+                this.InsertNode(value, root.LST);
+            }
         }
         else{
-            DeleteNode(target, root.RST);
+            if(root.RST === undefined){ //Insert
+                console.log("Insert RST");
+                root.RST = new Node(value);
+                root.RST.isRed = true;
+                root.RST.parent = root;
+
+                this.ValidateInsertion(root.RST);
+
+                return;
+            }
+            else{
+                console.log("Move down RST");
+                this.InsertNode(value, root.RST);
+            }
         }
     }
 
-    FindNode(target, root = this.root){
-        if(root == null || root.Value == undefined){
-            return false;
-        }
-        if (root.Value == target){
-            //Clean up display
-            //Set node to null
-            return true;
-        }
-
-        if(target < root.Value){
-            return this.FindNode(target, root.LST);
-        }
-        else{
-            return this.FindNode(target, root.RST);
-        }
-    }
-
-    Print(root = this.root){
-        if(root.Value == undefined){
-            return;
-        }
-
-        this.Print(root.LST);
-        console.log(root.Value + " ");
-        this.Print(root.RST);
-
-        return;
-    }
 }
