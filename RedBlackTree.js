@@ -66,6 +66,8 @@ class RedBlackTree{
         console.log("Validating " + node.value + ":");
         var uncle  = node.getUncle();
 
+
+        //THIS COULD BE PROBLEMATIC//
         if(node.getGrandParent() == undefined){
             console.log("No grandparent, no op");
             return;
@@ -84,8 +86,6 @@ class RedBlackTree{
         else{
             this.Recolor(node);
         }
-        
-        
     }
 
 
