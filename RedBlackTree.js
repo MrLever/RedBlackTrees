@@ -2,135 +2,97 @@ class Node{
     constructor(value){
         this.value = value;
         
-        this.parent = undefined;
-        this.LST = undefined;
-        this.RST = undefined;
+        this.parent = null;
+        this.LST = null;
+        this.RST = null;
 
+        this.level = 1;
+
+        //RB-Specific
         this.isRed = false;
-    }
-    getUncle(){
-        let grandParent = this.getGrandParent();
-        if(grandParent == undefined){
-            return undefined;
-        }
 
-        if(this.parent.getIsLeftChild()){
-            return grandParent.RST;
-        }
-        else{
-            return grandParent.LST;
-        }
+        //Rendering
+        this.x = 0;
+        this.y = 0;
+        this.geometry = new THREE.SphereGeometry(this.radius, 32, 32);
+        this.material = nodeShader.clone();
+        this.mesh = new THREE.Mesh(this.geometry, this.material);
+        
+        this.setPosition(0, 0);
+
+        scene.add(this.mesh);
     }
-    getIsLeftChild(){
-        return this.parent.LST === this;
-    }
-    getGrandParent(){
-        return (this.parent != undefined) ? this.parent.parent : undefined;
+
+    setPosition(x, y){
+        this.x = x; 
+        this.y = y;
+
+        this.mesh.translateX(x);
+        this.mesh.translateY(y);
+
     }
     
+    isLST(){
+        if(this.parent != undefined){
+            return this.parent.LST == this;
+        }
+        else return false;
+    }
+
+    refreshColor(){
+        if(this.isRed){
+            this.mesh.material.uniforms.materialColor.value = new THREE.Vector3(.8,0,0);
+        }
+        else{
+            this.mesh.material.uniforms.materialColor.value = new THREE.Vector3(.2,.2,.2);
+        }
+    }
+
 }
-class RedBlackTree{
+
+class BinaryTree{
     constructor(){
-        this.root = new Node(undefined);
+        this.root = null;
     }
 
-    InOrderTraversal(root = this.root){
-        if(root.LST != undefined){
-            this.InOrderTraversal(root.LST);
+    InsertNodeHelper(root, node){
+       if(node.value < root.value){
+           if(root.LST === null){
+               node.level = root.level + 1;
+               node.setPosition(root.x - 5, root.y - 5);
+               node.refreshColor();
+               root.LST = node;
+           }
+           else{
+               this.InsertNodeHelper(root.LST, node);
+           }
+       }
+       else{
+           if(root.RST === null){
+               node.level = root.level + 1;
+               node.setPosition(root.x + 5, root.y - 5);
+               node.refreshColor();
+               root.RST = node;
+           }
+           else{
+               this.InsertNodeHelper(root.RST, node);
+           }
+       }
+    }
+    InsertNode(value){
+        var node = new Node(value);
+        if(this.root === null){
+            node.level = 1;
+            this.root = node;
+
         }
-        console.log(root.value);
-        if(root.RST != undefined){
-            this.InOrderTraversal(root.RST);
+        else {
+            node.isRed = true;
+            this.InsertNodeHelper(this.root, node);
         }
     }
+}
 
-    Recolor(node) {
-        console.log("Recolor");
-        node.parent.isRed = false;
-        node.getUncle.isRed = false;
-        node.getGrandParent.isRed = true;
-        console.log("Propagate corrections upward");
-        this.ValidateInsertion(node.getGrandParent());
-    }
-
-    Rotate(){
-        console.log("Rotate");
-
-        //LEFT-LEFT Rotation
-        //LEFT-RIGHT Rotation
-        //RIGHT-LEFT Rotation
-        //Right-RIGHT Roation
-    }
-
-    ValidateInsertion(node){
-        console.log("Validating " + node.value + ":");
-        var uncle  = node.getUncle();
-
-
-        //THIS COULD BE PROBLEMATIC//
-        if(node.getGrandParent() == undefined){
-            console.log("No grandparent, no op");
-            return;
-        }
-
-        if(node === this.root){
-            node.isRed = false;
-            console.log("Root recolored");
-            return;
-        }
-        
-        if(uncle == undefined || uncle.isRed == false){
-            this.Rotate(node);
-            this.Recolor(node);
-        }
-        else{
-            this.Recolor(node);
-        }
-    }
-
-
-
-    InsertNode(value, root = this.root){
-        if(root.value == undefined){ //Only at root
-            console.log("Insert at root");
-            root.value = value;
-            root.isRed = false;
-
-            return;
-        }
-
-        if(value < root.value){
-            if(root.LST === undefined){ //Insert
-                console.log("Insert LST");
-                root.LST = new Node(value);
-                root.LST.isRed = true;
-                root.LST.parent = root;
-
-                this.ValidateInsertion(root.LST);
-
-                return;
-            }
-            else{ //Move down tree
-                console.log("Move down LST");
-                this.InsertNode(value, root.LST);
-            }
-        }
-        else{
-            if(root.RST === undefined){ //Insert
-                console.log("Insert RST");
-                root.RST = new Node(value);
-                root.RST.isRed = true;
-                root.RST.parent = root;
-
-                this.ValidateInsertion(root.RST);
-
-                return;
-            }
-            else{
-                console.log("Move down RST");
-                this.InsertNode(value, root.RST);
-            }
-        }
-    }
+class RedBlackTree extends BinaryTree{
 
 }

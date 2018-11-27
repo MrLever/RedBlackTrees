@@ -4,6 +4,8 @@
 var redBlackTree = new RedBlackTree();
 
 function mainFunction(){
+    document.body.appendChild( renderer.domElement );
+
     redBlackTree.InsertNode(1);
     redBlackTree.InsertNode(0);
     redBlackTree.InsertNode(2);
