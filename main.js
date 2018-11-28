@@ -7,11 +7,18 @@ function mainFunction(){
     document.body.appendChild( renderer.domElement );
 
     redBlackTree.InsertNode(1);
-    redBlackTree.InsertNode(0);
-    redBlackTree.InsertNode(2);
-    redBlackTree.InsertNode(3);
-    redBlackTree.InsertNode(4);
+    //redBlackTree.InsertNode(0);
+    //redBlackTree.InsertNode(2);
+    //redBlackTree.InsertNode(1.5); 
+    //redBlackTree.InsertNode(3);
+    //redBlackTree.InsertNode(4);
     
 
-    //redBlackTree.InOrderTraversal();
+    function animate(time) {
+        requestAnimationFrame( animate );
+        renderer.render( scene, camera );
+        TWEEN.update(time);
+    }
+
+    animate();
 }

@@ -49,7 +49,7 @@ scene = new THREE.Scene();
 scene.add(light);
 
 var aspect = window.innerWidth / window.innerHeight;
-camera = new THREE.PerspectiveCamera( 60, aspect, 1, 100 );
+camera = new THREE.PerspectiveCamera( 60, aspect, 1, 100000 );
 
 var cameraControls = new THREE.OrbitControls( camera, renderer.domElement);
 cameraControls.addEventListener("change",render,false)
@@ -64,4 +64,17 @@ function render() {
     
     //Render scene normally
     renderer.render( scene, camera );
+}
+
+function animateNode(nodeMesh, target){
+    var tween = new TWEEN.Tween(nodeMesh.position)
+    .to({ x: target.x, y: target.y }, 2000)
+    .easing(TWEEN.Easing.Quadratic.In)
+    .onUpdate(function(){})
+    .onComplete(function(){
+        console.log("done");
+    });
+    tween.start();
+
+    return tween;
 }
