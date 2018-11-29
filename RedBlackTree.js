@@ -649,54 +649,57 @@ class RedBlackTree extends BinaryTree{
             node.refreshColor();
             return;
         }
-        else if(sibling == null || sibling.isRed == false){ //Sibling is Black
+        else{
             node.isDoubleBlack = true;
             node.isRed = false;
+            //console.log(sibling);
             var r = node.getRedNeice();
-            
+            //console.log("Niece");
+            //console.log(r);
             if(r != null){ //Sibling has a red child
-                //LEFT LEFT
-                if(sibling.isLST() == true && r.isLST() == true){
-                    console.log("Perform left left removal rotation");
-                    this.LeftLeftRotation(r);
-                    r.isRed = false;
-                    r.refreshColor();
-                    node.parent.isRed = false;
-                    node.parent.refreshColor();
+                if(sibling.isRed == false){ //Cases in which the sibling is black
+                    //LEFT LEFT
+                    if(sibling.isLST() == true && r.isLST() == true){
+                        console.log("Perform left left removal rotation");
+                        this.LeftLeftRotation(r);
+                        r.isRed = false;
+                        r.refreshColor();
+                        node.parent.isRed = false;
+                        node.parent.refreshColor();
 
-                }
-                //LEFT RIGHT
-                if(sibling.isLST() == true && r.isLST() == false){
-                    console.log("Perform left right removal rotation");
-                    this.LeftRightRotation(r);
-                    r.isRed = false;
-                    r.refreshColor();
-                    node.parent.isRed = false;
-                    node.parent.refreshColor();
+                    }
+                    //LEFT RIGHT
+                    if(sibling.isLST() == true && r.isLST() == false){
+                        console.log("Perform left right removal rotation");
+                        this.LeftRightRotation(r);
+                        r.isRed = false;
+                        r.refreshColor();
+                        node.parent.isRed = false;
+                        node.parent.refreshColor();
 
-                }
-                //RIGHT RIGHT
-                if(sibling.isLST() == false && r.isLST() == false){
-                    console.log("Perform right right removal rotation");
-                    this.RightRightRotation(r);
-                    r.isRed = false;
-                    r.refreshColor();
-                    node.parent.isRed = false;
-                    node.parent.refreshColor();
-                }
-                //RIGHT LEFT
-                if(sibling.isLST() == false && r.isLST() == true){
-                    console.log("Perform right left removal rotation");
-                    this.RightLeftRotation(r);
-                    r.isRed = false;
-                    r.refreshColor();
-                    node.parent.isRed = false;
-                    node.parent.refreshColor();
+                    }
+                    //RIGHT RIGHT
+                    if(sibling.isLST() == false && r.isLST() == false){
+                        console.log("Perform right right removal rotation");
+                        this.RightRightRotation(r);
+                        r.isRed = false;
+                        r.refreshColor();
+                        node.parent.isRed = false;
+                        node.parent.refreshColor();
+                    }
+                    //RIGHT LEFT
+                    if(sibling.isLST() == false && r.isLST() == true){
+                        console.log("Perform right left removal rotation");
+                        this.RightLeftRotation(r);
+                        r.isRed = false;
+                        r.refreshColor();
+                        node.parent.isRed = false;
+                        node.parent.refreshColor();
+                    }
                 }
             }
-            else{ //Sibling has no red children.
+            
 
-            }
         }
 
         if(node.value == undefined){
