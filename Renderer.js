@@ -41,7 +41,7 @@ var light;
 renderer = new THREE.WebGLRenderer( { antialias: true } );//let renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
 renderer.setPixelRatio( window.devicePixelRatio );
-renderer.setClearColor (0xD3D3D3, 1);
+renderer.setClearColor (0x303030, 1);
 
 
 scene = new THREE.Scene();

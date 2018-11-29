@@ -6,13 +6,16 @@ var redBlackTree = new RedBlackTree();
 function mainFunction(){
     document.body.appendChild( renderer.domElement );
 
-    redBlackTree.InsertNode(1);
+    //redBlackTree.InsertNode(1);
     //redBlackTree.InsertNode(0);
     //redBlackTree.InsertNode(2);
     //redBlackTree.InsertNode(1.5); 
     //redBlackTree.InsertNode(3);
     //redBlackTree.InsertNode(4);
-    
+
+    var gui = new dat.GUI();
+    gui.add(redBlackTree, 'insertValue')
+    gui.add(redBlackTree, 'InsertNode');
 
     function animate(time) {
         requestAnimationFrame( animate );
