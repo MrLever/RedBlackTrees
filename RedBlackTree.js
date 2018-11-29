@@ -10,7 +10,7 @@ class Node{
         this.index = -1;
         //RB-Specific
         this.isRed = false;
-
+        this.isDoubleBlack = false;
         //Rendering
         this.parentEdge = null;
 
@@ -27,6 +27,18 @@ class Node{
         scene.add(this.mesh);
 
         //Text labels
+       
+        
+        this.sprite = null;
+        this.makeSprite();
+        // this.sprite.translateZ(1)
+        
+    }
+    makeSprite(){
+        if(this.sprite != null){
+            scene.remove(scene.getObjectById(this.sprite.id));
+        }
+
         var fontface = "Georgia";
         var fontsize = 24;
         var borderThickness = 4;
@@ -57,11 +69,11 @@ class Node{
             map: texture,
             color: 0xffffff
         });
+        
         this.sprite = new THREE.Sprite(spriteMaterial);
         this.sprite.scale.set(10, 5, 1.0);
         this.sprite.translateX(4.5 - 10);
         this.sprite.translateY(10);
-        // this.sprite.translateZ(1)
         scene.add(this.sprite);
     }
     clearEdge(){
@@ -117,19 +129,60 @@ class Node{
             }
         }
     }
+    getSibling(){
+        if(this.parent != null){
+            if(this.isLST() === true){
+                return this.parent.RST;
+            }
+            else{
+                return this.parent.LST;
+            }
+        }
+        return null;
+    }
+    getRedNeice(){
+        if(this.getSibling() == null){
+            return null;
+        }
 
+        if(this.getSibling().RST != null && this.getSibling().RST.isRed == true){
+            return this.getSibling().RST;
+        }
+        else if(this.getSibling().LST != null && this.getSibling().LST.isRed == true){
+            return this.getSibling().LST;
+        }
+        else{
+            return null;
+        }
+    }
+    hasRedNephew(){
+        var sibling = this.getSibling();
+        if(sibling.LST == null && sibling.RST == null){
+            return false;
+        }
+        else if((sibling.LST != null && sibling.LST.isRed == true) || (sibling.RST != null && sibling.RST.isRed == true)){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
     refreshColor(){
-        if(this.isRed){
+        if(this.isDoubleBlack){
+            this.mesh.material.uniforms.materialColor.value = new THREE.Vector3(.0,.0,.0);
+        }
+        else if(this.isRed){
             this.mesh.material.uniforms.materialColor.value = new THREE.Vector3(.8,0,0);
         }
         else{
             this.mesh.material.uniforms.materialColor.value = new THREE.Vector3(.2,.2,.2);
         }
     }
-
     destroyNode(){
         console.log("Destroy node: " + this.value);
         scene.remove(scene.getObjectById(this.mesh.id));
+        scene.remove(scene.getObjectById(this.sprite.id));
+        this.clearEdge();
     }
 
 }
@@ -138,6 +191,8 @@ class BinaryTree{
     constructor(){
         this.root = null;
         this.insertValue = 0;
+        this.deleteValue = 0;
+        this.deletedNode = null;
     }
     DrawEdges(root){
         if(root == null) 
@@ -206,61 +261,6 @@ class BinaryTree{
     }
     FindDepth(){
         return this.FindDepthHelper(this.root);
-    }
-
-    RemoveNodeHelper(node, value){ 
-        if(node === null) 
-            return null; 
-      
-        if(value < node.value){ 
-            node.LST = this.RemoveNodeHelper(node.LST, value); 
-            return node; 
-        } 
-        else if(value > node.value){ 
-            node.RST = this.RemoveNodeHelper(node.RST, value); 
-            return node; 
-        } 
-        else{ 
-            
-            // Node has no children
-            if(node.LST === null && node.RST === null){ 
-                node.destroyNode();
-                node = null; 
-                return node; 
-            } 
-      
-            // Nodes have one child 
-            if(node.LST === null){ 
-                node.destroyNode();
-                node.RST.parent = node.parent;
-                node = node.RST; 
-                return node; 
-            } 
-            else if(node.RST === null){ 
-                node.destroyNode();
-                node.LST.parent = node.parent;
-                node = node.LST; 
-                return node; 
-            } 
-
-            node.destroyNode();
-            //Find and replace value
-            var newNode = this.FindMinNode(node.RST); 
-            node.value = newNode.value; 
-
-            //Remove duplicate value
-            node.RST = this.RemoveNodeHelper(node.RST, newNode.value); 
-            
-            return node; 
-        } 
-      
-    }
-
-    RemoveNode(value){
-        var removedNode = this.root = this.RemoveNodeHelper(this.root, value);
-        
-        if(removedNode != null)
-            this.UpdateTreePositions(this.root);
     }
 
     UpdateNodeIndicies(root){
@@ -339,6 +339,24 @@ class BinaryTree{
         this.UpdateNodeLevels(this.root);
         this.UpdateTreePositionsHelper(this.root, depth);
 
+    }
+
+    findNodeHelper(root, value){
+        if(root == null)
+            return null;
+
+        if(root.value == value){
+            return root;
+        }
+        if(value < root.value){
+            return this.findNodeHelper(root.LST, value);
+        }
+        else{
+            return this.findNodeHelper(root.RST, value);
+        }
+    }
+    findNode(value){
+        return this.findNodeHelper(this.root, value);
     }
 }
 
@@ -597,8 +615,166 @@ class RedBlackTree extends BinaryTree{
         this.DrawEdges(this.root);
         
     }
-    RemoveNode(value){
-        super.RemoveNode(value);
-        console.log("RBREMOVE");
+    
+    ValidateRemoval(node, original){
+        console.log("Validate removal of: ");
+        //console.log(original);
+        if(this.root == null){
+            return;
+        }
+        
+        if(node == null){ //New node was null, make a temporary one;
+            node = new Node(undefined);
+            node.isRed = false;
+            node.isDoubleBlack = true;
+            node.refreshColor();
+            node.parent = original.parent;
+            if(original.isLST()){
+                node.parent.LST = node;
+            }
+            else{
+                node.parent.RST = node;
+            }
+            
+            //console.log(node);
+            this.UpdateTreePositions();
+            this.DrawEdges();
+        }
+
+        var sibling = node.getSibling();
+        var parent = node.parent;
+
+        if((node.isRed == true && original.isRed == false) || (node.isRed == false && original.isRed == true)){ //Easy case, either U or V was red
+            node.isRed = false;
+            node.refreshColor();
+            return;
+        }
+        else if(sibling == null || sibling.isRed == false){ //Sibling is Black
+            node.isDoubleBlack = true;
+            node.isRed = false;
+            var r = node.getRedNeice();
+            
+            if(r != null){ //Sibling has a red child
+                //LEFT LEFT
+                if(sibling.isLST() == true && r.isLST() == true){
+                    console.log("Perform left left removal rotation");
+                    this.LeftLeftRotation(r);
+                    r.isRed = false;
+                    r.refreshColor();
+                    node.parent.isRed = false;
+                    node.parent.refreshColor();
+
+                }
+                //LEFT RIGHT
+                if(sibling.isLST() == true && r.isLST() == false){
+                    console.log("Perform left right removal rotation");
+                    this.LeftRightRotation(r);
+                    r.isRed = false;
+                    r.refreshColor();
+                    node.parent.isRed = false;
+                    node.parent.refreshColor();
+
+                }
+                //RIGHT RIGHT
+                if(sibling.isLST() == false && r.isLST() == false){
+                    console.log("Perform right right removal rotation");
+                    this.RightRightRotation(r);
+                    r.isRed = false;
+                    r.refreshColor();
+                    node.parent.isRed = false;
+                    node.parent.refreshColor();
+                }
+                //RIGHT LEFT
+                if(sibling.isLST() == false && r.isLST() == true){
+                    console.log("Perform right left removal rotation");
+                    this.RightLeftRotation(r);
+                    r.isRed = false;
+                    r.refreshColor();
+                    node.parent.isRed = false;
+                    node.parent.refreshColor();
+                }
+            }
+            else{ //Sibling has no red children.
+
+            }
+        }
+
+        if(node.value == undefined){
+            node.destroyNode();
+            if(node.isLST()){
+                node.parent.LST = null;
+            }
+            else{
+                node.parent.RST = null;
+            }
+        }       
+        
+    }
+
+    RemoveNodeHelper(node, value){ 
+        var original = node;
+
+        if(node === null) 
+            return null; 
+      
+        if(value < node.value){ 
+            node.LST = this.RemoveNodeHelper(node.LST, value); 
+            return node;
+        } 
+        else if(value > node.value){ 
+            node.RST = this.RemoveNodeHelper(node.RST, value); 
+            return node;
+        } 
+        else{ 
+            // Node has no children
+            if(node.LST === null && node.RST === null){ 
+                console.log("Delete leaf node");
+                node.destroyNode();
+                node = null; 
+                if(original.isRed == false) //If it was red, no validation necessary
+                    this.ValidateRemoval(node, original);
+                
+                return node; 
+            } 
+      
+            // Nodes have one child 
+            if(node.LST === null){ 
+                node.destroyNode();
+                node.RST.parent = node.parent;
+                node = node.RST; 
+                this.ValidateRemoval(node, original);
+
+                return node; 
+            } 
+            else if(node.RST === null){ 
+                node.destroyNode();
+                node.LST.parent = node.parent;
+                node = node.LST; 
+                this.ValidateRemoval(node, original);
+
+                return node; 
+            } 
+
+            //node.destroyNode();
+            //Find and replace value
+            var newNode = this.FindMinNode(node.RST); 
+            node.value = newNode.value; 
+            node.makeSprite();
+
+            //Remove duplicate value
+            node.RST = this.RemoveNodeHelper(node.RST, newNode.value); 
+            return node; 
+        } 
+        
+    }
+
+    RemoveNode(value = this.deleteValue){
+        var replacementNode  = this.RemoveNodeHelper(this.root, value);
+        console.log(replacementNode);
+
+        this.UpdateTreePositions(this.root);
+        this.DrawEdges(this.root);
+        
+        //return replacementNode;
     }
 }
