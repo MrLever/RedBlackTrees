@@ -33,12 +33,36 @@ class Node{
         var canvas = document.createElement('canvas');
         var context = canvas.getContext('2d');
         var backgroundColor = {
+            r: 0,
+            g: 0,
+            b: 0,
+            a: 0.0
+        };
+        var fontColor = {
             r: 255,
             g: 255,
             b: 255,
-            a: 0.0
+            a: 1.0
         };
+        context.font = "Bold " + fontsize + "px " + fontface;
+        var metrics = context.measureText(this.value);
+        var textWidth = metrics.width;
+        context.fillStyle = "rgba(" + fontColor.r + "," + fontColor.g + "," + fontColor.b + "," + fontColor.a + ")";
+        context.fillText(this.value, borderThickness, fontsize + borderThickness);
 
+        var texture = new THREE.Texture(canvas)
+        texture.needsUpdate = true;
+
+        var spriteMaterial = new THREE.SpriteMaterial({
+            map: texture,
+            color: 0xffffff
+        });
+        this.sprite = new THREE.Sprite(spriteMaterial);
+        this.sprite.scale.set(10, 5, 1.0);
+        this.sprite.translateX(4.5 - 10);
+        this.sprite.translateY(10);
+        // this.sprite.translateZ(1)
+        scene.add(this.sprite);
     }
     clearEdge(){
         if(this.parentEdge != null){
@@ -61,9 +85,10 @@ class Node{
     }
     setPosition(targetX, targetY){
         var target = new THREE.Vector3(targetX,targetY,0);
+        var textTarget= new THREE.Vector3(targetX+4.5, targetY, -2);
         //console.log("Targeting " + target.x + ", " + target.y);
         animateNode(this.mesh, target);
-
+        animateNode(this.sprite, textTarget);
         this.x = targetX; 
         this.y = targetY;
 
