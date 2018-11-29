@@ -362,7 +362,7 @@ class BinaryTree{
 
 class RedBlackTree extends BinaryTree{
     LeftLeftRotation(node){
-        console.log("Left Left Rotation");
+        console.log("Left Left Rotation on: " + node.value);
         var uncle = node.getUncle();
         var parent = node.parent;
         var grandparent = node.parent.parent;
@@ -427,7 +427,7 @@ class RedBlackTree extends BinaryTree{
         //console.log(this);
     }
     LeftRightRotation(node){
-        console.log("Left Right Rotation");
+        console.log("Left Right Rotation on: " + node.value);
         var parent = node.parent;
         var grandparent = node.parent.parent;
 
@@ -458,12 +458,12 @@ class RedBlackTree extends BinaryTree{
         
         //console.log(this);
 
-        //Left Left rotatre from parent
+        //Left Left rotate from parent
         this.LeftLeftRotation(parent);
 
     }
     RightRightRotation(node){
-        console.log("Right Right Rotation");
+        console.log("Right Right Rotation on: " + node.value);
         var uncle = node.getUncle();
         var parent = node.parent;
         var grandparent = node.parent.parent;
@@ -512,7 +512,7 @@ class RedBlackTree extends BinaryTree{
         grandparent.refreshColor();
 
         if(uncle != null){
-            console.log("Uncle not null");
+            //console.log("Uncle not null");
             uncle.parent = grandparent;
             uncle.LST = t1;
             uncle.RST = t2;
@@ -529,7 +529,7 @@ class RedBlackTree extends BinaryTree{
     }
 
     RightLeftRotation(node){
-        console.log("Right Left Rotation");
+        console.log("Right Left Rotation on: " + node.value);
         var parent = node.parent;
         var grandparent = node.parent.parent;
 
@@ -622,6 +622,21 @@ class RedBlackTree extends BinaryTree{
         if(this.root == null){
             return;
         }
+
+        if(node == this.root && node.isDoubleBlack == true){
+            if(node.LST != null){
+                node.LST.isRed = true;
+                node.LST.refreshColor();
+            }
+            if(node.RST != null){
+                node.RST.isRed = true;
+                node.RST.refreshColor();
+            }
+            node.isDoubleBlack = false;
+            node.isRed = false;
+            node.refreshColor();
+            return;
+        }
         
         if(node == null){ //New node was null, make a temporary one;
             node = new Node(undefined);
@@ -649,57 +664,43 @@ class RedBlackTree extends BinaryTree{
             node.refreshColor();
             return;
         }
-        else{
+        else if(sibling == null ||sibling.isRed == false){ //Sibling is black
             node.isDoubleBlack = true;
             node.isRed = false;
-            //console.log(sibling);
             var r = node.getRedNeice();
-            //console.log("Niece");
-            //console.log(r);
+
+            
+         
             if(r != null){ //Sibling has a red child
-                if(sibling.isRed == false){ //Cases in which the sibling is black
-                    //LEFT LEFT
-                    if(sibling.isLST() == true && r.isLST() == true){
-                        console.log("Perform left left removal rotation");
-                        this.LeftLeftRotation(r);
-                        r.isRed = false;
-                        r.refreshColor();
-                        node.parent.isRed = false;
-                        node.parent.refreshColor();
-
-                    }
-                    //LEFT RIGHT
-                    if(sibling.isLST() == true && r.isLST() == false){
-                        console.log("Perform left right removal rotation");
-                        this.LeftRightRotation(r);
-                        r.isRed = false;
-                        r.refreshColor();
-                        node.parent.isRed = false;
-                        node.parent.refreshColor();
-
-                    }
-                    //RIGHT RIGHT
-                    if(sibling.isLST() == false && r.isLST() == false){
-                        console.log("Perform right right removal rotation");
-                        this.RightRightRotation(r);
-                        r.isRed = false;
-                        r.refreshColor();
-                        node.parent.isRed = false;
-                        node.parent.refreshColor();
-                    }
-                    //RIGHT LEFT
-                    if(sibling.isLST() == false && r.isLST() == true){
-                        console.log("Perform right left removal rotation");
-                        this.RightLeftRotation(r);
-                        r.isRed = false;
-                        r.refreshColor();
-                        node.parent.isRed = false;
-                        node.parent.refreshColor();
-                    }
+                //LEFT LEFT
+                this.RemovalRotations(sibling, r, node);
+            }
+            else{ //Recolor and recur.
+                console.log("Recolor")
+                console.log(sibling);
+                if(sibling != null){
+                    sibling.isRed = true;
+                    sibling.refreshColor();
+                }
+                
+                if(node.parent.isRed == false){
+                    node.parent.isDoubleBlack = true;
+                    node.parent.isRed = false;
+                    node.parent.refreshColor();
+                    this.ValidateRemoval(node.parent, node.parent);
+                }
+                else{
+                    node.parent.isDoubleBlack = false;
+                    node.parent.isRed = false;
+                    node.parent.refreshColor();
                 }
             }
             
-
+        }
+        else{ //Sibling is red
+            if(node.isLST()){
+                console.log("oof");
+            }
         }
 
         if(node.value == undefined){
@@ -712,6 +713,45 @@ class RedBlackTree extends BinaryTree{
             }
         }       
         
+    }
+
+    RemovalRotations(sibling, r, node) {
+        console.log("Perform removal rotations.");
+        if (sibling.isLST() == true && r.isLST() == true) {
+            console.log("Perform left left removal rotation");
+            this.LeftLeftRotation(r);
+            r.isRed = false;
+            r.refreshColor();
+            node.parent.isRed = false;
+            node.parent.refreshColor();
+        }
+        //LEFT RIGHT
+        else if (sibling.isLST() == true && r.isLST() == false) {
+            console.log("Perform left right removal rotation");
+            this.LeftRightRotation(r);
+            r.isRed = false;
+            r.refreshColor();
+            node.parent.isRed = false;
+            node.parent.refreshColor();
+        }
+        //RIGHT RIGHT
+        else if (sibling.isLST() == false && r.isLST() == false) {
+            console.log("Perform right right removal rotation");
+            this.RightRightRotation(r);
+            r.isRed = false;
+            r.refreshColor();
+            node.parent.isRed = false;
+            node.parent.refreshColor();
+        }
+        //RIGHT LEFT
+        else if (sibling.isLST() == false && r.isLST() == true) {
+            console.log("Perform right left removal rotation");
+            this.RightLeftRotation(r);
+            r.isRed = false;
+            r.refreshColor();
+            node.parent.isRed = false;
+            node.parent.refreshColor();
+        }
     }
 
     RemoveNodeHelper(node, value){ 
@@ -773,7 +813,7 @@ class RedBlackTree extends BinaryTree{
 
     RemoveNode(value = this.deleteValue){
         var replacementNode  = this.RemoveNodeHelper(this.root, value);
-        console.log(replacementNode);
+        //console.log(replacementNode);
 
         this.UpdateTreePositions(this.root);
         this.DrawEdges(this.root);
